@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../node_modules/@microsoft/sp-module-interfaces/lib/manifestSchemas/jsonSchemas/clientSideComponentManifestSchema.json",
+
+  "id": "be814299-1f07-442b-8348-6e39f5d541eb",
+  "alias": "ListSpaceVisualizerWebPart",
+  "componentType": "WebPart",
+  "version": "0.0.1",
+  "manifestVersion": 2,
+
+  "preconfiguredEntries": [{
+    "groupId": "be814299-1f07-442b-8348-6e39f5d541eb",
+    "group": { "default": "Under Development" },
+    "title": { "default": "ListSpaceVisualizer" },
+    "description": { "default": "ListSpaceVisualizer description" },
+    "officeFabricIconFontName": "Page",
+    "properties": {
+      "description": "ListSpaceVisualizer"
+    }
+  }]
+}

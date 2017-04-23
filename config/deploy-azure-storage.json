@@ -1,0 +1,6 @@
+{
+  "workingDir": "./temp/deploy/",
+  "account": "<!-- STORAGE ACCOUNT NAME -->",
+  "container": "react-d-3-space-visualizer",
+  "accessKey": "<!-- ACCESS KEY -->"
+}

@@ -1,0 +1,13 @@
+{
+  "entries": [
+    {
+      "entry": "./lib/webparts/listSpaceVisualizer/ListSpaceVisualizerWebPart.js",
+      "manifest": "./src/webparts/listSpaceVisualizer/ListSpaceVisualizerWebPart.manifest.json",
+      "outputPath": "./dist/list-space-visualizer.bundle.js"
+    }
+  ],
+  "externals": {},
+  "localizedResources": {
+    "listSpaceVisualizerStrings": "webparts/listSpaceVisualizer/loc/{locale}.js"
+  }
+}
