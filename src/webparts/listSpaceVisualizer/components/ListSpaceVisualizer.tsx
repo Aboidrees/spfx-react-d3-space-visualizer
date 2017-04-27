@@ -8,11 +8,25 @@ import TreeMap from "react-d3-treemap";
 import "react-d3-treemap/dist/react.d3.treemap.css";
 import ContainerDimensions from 'react-container-dimensions';
 
-import * as pnp from 'sp-pnp-js';
-
+import pnp, { Logger, FunctionListener, LogEntry, LogLevel } from "sp-pnp-js";
+import { Log } from "@microsoft/sp-core-library";
 
 import { IListSpaceVisualizerProps } from './IListSpaceVisualizerProps';
 import { IListSpaceVisualizerState } from './IListSpaceVisualizerState';
+
+interface IResponseFile {
+  Length: number;
+}
+interface IResponseItem {
+  File: IResponseFile;
+  FileLeafRef: string;
+  Title: string;
+}
+interface IFile {
+  Title: string;
+  Name: string;
+  Size: number;
+}
 
 export default class ListSpaceVisualizer extends React.Component<IListSpaceVisualizerProps, IListSpaceVisualizerState> {
 
@@ -23,10 +37,27 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
     this.state = {
       items: []
     };
+
+    this.readAllFilesSize.bind(this);
+
+    // pnp-js Logger. set the active log level
+    Logger.activeLogLevel = LogLevel.Info;
+    // https://github.com/SharePoint/PnP-JS-Core/wiki/Working-With:-Logging
+    // pnp-js Logger. subscribe a listener
+    // Logger.subscribe(new ConsoleListener());
+    // pnp-js Logger. subscribe a custom listener integrated with SPFx Logging system
+    let listener = new FunctionListener((entry: LogEntry) => {
+      const componentName: string = (this as any)._reactInternalInstance._currentElement.type.name;
+      const logLevelConversion = { Verbose: "verbose", Info: "info", Warning: "warn", Error: "error" };
+      const formatedMessage: string = `Message: ${entry.message} Data: ${JSON.stringify(entry.data)}`;
+      Log[logLevelConversion[LogLevel[entry.level]]](componentName, new Error(formatedMessage));
+    });
+    Logger.subscribe(listener);
   }
 
   public componentDidMount(): void {
-    this.readItems();
+    // this.readItems();
+    this.readAllFilesSize("Documents");
   }
 
   public render(): React.ReactElement<IListSpaceVisualizerProps> {
@@ -42,33 +73,38 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
             />
           }
         </ContainerDimensions>*/}
-        {this.state.items}
+        {this.state.items.map((item) => {
+          return (
+            <div>{item.Name}: {item.Size}</div>
+          );
+        })}
       </div>
-    )
+    );
   }
 
-  private readItems = (): void => {
-
-    // pnp.sp.web.getFileByServerRelativeUrl("/sites/dev/shared documents/file.txt").approve("Approval Comment").then(_ => {
-    //     console.log("File approved!");
-    // });
-
-
-    // this.updateStatus('Loading all items...');
-    pnp.sp.web.lists.getByTitle("Documents")
-      .items
-      .select('File/Length')
-      .expand('File/Length')
-      .get()
-      .then((items: any): void => {
-        items.forEach((item: any) => {
-              console.log(item.File.Length);
-        });
-        this.setState({ items });
-      })
-      .catch((error: any): void => {
-        console.warn("Loading all items failed with error: " + error);
+  private async readAllFilesSize(libraryName: string): Promise<void> {
+    try {
+      const response: IResponseItem[] = await pnp.sp
+        .web
+        .lists
+        .getByTitle(libraryName)
+        .items
+        .select("Title", "FileLeafRef", "asdasf")
+        .expand("File/Length")
+        .get();
+      const items: IFile[] = response.map((item: IResponseItem) => {
+        return {
+          Title: item.Title,
+          Size: item.File.Length,
+          Name: item.FileLeafRef
+        };
       });
+      this.setState({ items });
+    } catch (error) {
+      // throw new Error(error);
+      // do something with State
+      this.setState({ items: [] });
+    }
   }
 
 };
