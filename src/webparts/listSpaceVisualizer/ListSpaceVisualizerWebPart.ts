@@ -7,7 +7,7 @@ import {
   PropertyPaneTextField,
   PropertyPaneDropdown
 } from '@microsoft/sp-webpart-base';
-
+import pnp from "sp-pnp-js";
 import * as strings from 'listSpaceVisualizerStrings';
 import ListSpaceVisualizer from './components/ListSpaceVisualizer';
 import { IListSpaceVisualizerProps } from './components/IListSpaceVisualizerProps';
@@ -15,8 +15,18 @@ import { IListSpaceVisualizerWebPartProps } from './IListSpaceVisualizerWebPartP
 
 export default class ListSpaceVisualizerWebPart extends BaseClientSideWebPart<IListSpaceVisualizerWebPartProps> {
 
+  // establish SPFx context
+  // https://github.com/SharePoint/PnP-JS-Core/wiki/Using-sp-pnp-js-in-SharePoint-Framework
+  public onInit(): Promise<void> {
+    return super.onInit().then(_ => {
+      pnp.setup({
+        spfxContext: this.context
+      });
+    });
+  }
+
   public render(): void {
-    const element: React.ReactElement<IListSpaceVisualizerProps > = React.createElement(
+    const element: React.ReactElement<IListSpaceVisualizerProps> = React.createElement(
       ListSpaceVisualizer,
       {
         description: this.properties.description

@@ -2,7 +2,7 @@ import * as React from 'react';
 import styles from './ListSpaceVisualizer.module.scss';
 
 // import interfaces
-import { IFile, IResponseFile, IResponseItem, IResponseFolder } from "../interfaces"
+import { IFile, IResponseFile, IResponseItem, IResponseFolder, IResponseItemCount } from "../interfaces";
 
 // import pnp and pnp logging system
 import pnp, { Logger, FunctionListener, LogEntry, LogLevel } from "sp-pnp-js";
@@ -41,7 +41,9 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
   }
 
   public componentDidMount(): void {
-    this._readAllFilesSize("Documents");
+    const libraryName: string = "Documents";
+    console.log("libraryName: " + libraryName);
+    this._readAllFilesSize(libraryName);
   }
 
   public render(): React.ReactElement<IListSpaceVisualizerProps> {
@@ -73,34 +75,43 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
     );
   }
 
-  // Async functions were introduced with ES3/ES5 native support in TypeScript 2.1
+
+  private async _pnpjsGetItemCount<T>(libraryName: string, selects: string): Promise<T> {
+    return pnp.sp.web.lists.getByTitle(libraryName)
+      .select(selects)
+      .getAs<T>();
+  }
+
+  private async _pnpjs_GetAllItems<T>(libraryName: string, selects: string): Promise<T> {
+    return pnp.sp.web.lists.getByTitle(libraryName)
+      .items
+      .select(selects)
+      .expand("File/Length")
+      .get();
+  }
+
+  // async functions were introduced with ES3/ES5 native support in TypeScript 2.1
   // https://blogs.msdn.microsoft.com/typescript/2016/12/07/announcing-typescript-2-1/
-  // Async function always return a Promise, on this scenario we return void Promise
+  // async function always return a Promise, on this scenario we return void Promise
   //   because we will not need it as we are directly setting the Component´s state
   private async _readAllFilesSize(libraryName: string): Promise<void> {
     console.log("_readAllFilesSize");
-    let itemCount: number = 0;
     try {
-      const responseItemCount = await pnp.sp.web.lists
-        .getByTitle(libraryName)
-        .select("ItemCount")
-        .get();
-      itemCount = responseItemCount.ItemCount;
+      // query Item Count for the Library
+      const selectsPropsObject: IResponseItemCount = { ItemCount: null };
+      const selectsString: string = Object.keys(selectsPropsObject).join(",");
+      const responseItemCount: IResponseItemCount = await this._pnpjsGetItemCount<IResponseItemCount>(libraryName, selectsString);
+      debugger;
+      const itemCount: number = responseItemCount.ItemCount;
       console.log("itemCount: " + itemCount);
-    } catch (error) {
-      // set a new state conserving the previous state + the new error
-      this.setState({
-        ...this.state,
-        errors: [...this.state.errors, "Error getting ItemCount for " + libraryName + ". Error: " + error]
-      });
-    }
 
-    // We will follow two strategies:
-    //  Small libraries: get all the items and build the hierarchy object
-    //  Big libraries: query by folders
-    if (itemCount > 5) {
-      // BIG Libraries
-      try {
+      // we will follow two strategies:
+      //  small libraries: get all the items and build the hierarchy object
+      //  big libraries: query by folders
+      if (itemCount > 5) {
+        // big Libraries
+
+      } else {
         const response: IResponseFile[] = await pnp.sp.web.lists
           .getByTitle(libraryName)
           .rootFolder
@@ -121,8 +132,8 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
           .rootFolder
           .folders
           .get();
-          debugger;
-          // if the folder has some documents then call again
+        debugger;
+        // if the folder has some documents then call again
         responseFolders.forEach((item: IResponseFolder) => {
           return {
             Name: item.Name,
@@ -131,12 +142,16 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
 
         // Set our Component´s State
         this.setState({ ...this.state, items });
-      } catch (error) {
-        // set a new state conserving the previous state + the new error
-        this.setState({ ...this.state, errors: [...this.state.errors, error] });
       }
-    }
 
+    } catch (error) {
+      // set a new state conserving the previous state + the new error
+      console.error(error);
+      this.setState({
+        ...this.state,
+        errors: [...this.state.errors, "Error getting ItemCount for " + libraryName + ". Error: " + error]
+      });
+    }
   }
 
 
