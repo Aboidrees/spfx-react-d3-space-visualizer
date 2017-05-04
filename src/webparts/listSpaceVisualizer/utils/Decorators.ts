@@ -1,8 +1,7 @@
 
 export function logProperty(target: any, key: string) {
-
   // property value
-  var _val = this[key];
+  var _val = target[key];
 
   // property getter
   var getter = function () {
@@ -17,7 +16,7 @@ export function logProperty(target: any, key: string) {
   };
 
   // delete property.
-  if (delete this[key]) {
+  if (delete target[key]) {
 
     // create new property with getter and setter
     Object.defineProperty(target, key, {

@@ -4,6 +4,9 @@ import styles from './ListSpaceVisualizer.module.scss';
 // import interfaces
 import { IFile, IResponseFile, IResponseItem, IResponseFolder, IResponseItemCount } from "../interfaces";
 
+// import model
+import { ListItemCount } from "../model/ListItemCount";
+
 // import pnp and pnp logging system
 import pnp, { Logger, FunctionListener, LogEntry, LogLevel } from "sp-pnp-js";
 // import SPFx Logging system
@@ -76,10 +79,12 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
   }
 
 
-  private async _pnpjsGetItemCount<T>(libraryName: string, selects: string): Promise<T> {
-    return pnp.sp.web.lists.getByTitle(libraryName)
-      .select(selects)
-      .getAs<T>();
+  private async _pnpjsGetItemCount<T>(libraryName: string, selects: string): Promise<any> {
+    debugger;
+    return pnp.sp.web.lists.as(ListItemCount).get();
+      // .getByTitle(libraryName)
+      // .select(selects)
+      // .get();
   }
 
   // try that https://github.com/SharePoint/PnP-JS-Core/wiki/Extending-with-Custom-Business-Objects
@@ -96,6 +101,11 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
   // async function always return a Promise, on this scenario we return void Promise
   //   because we will not need it as we are directly setting the Component´s state
   private async _readAllFilesSize(libraryName: string): Promise<void> {
+
+    // let a: ListItemCount = new ListItemCount();
+    // console.log(a);
+    // debugger;
+
     console.log("_readAllFilesSize");
     try {
       // query Item Count for the Library
