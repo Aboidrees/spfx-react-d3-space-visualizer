@@ -82,6 +82,7 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
       .getAs<T>();
   }
 
+  // try that https://github.com/SharePoint/PnP-JS-Core/wiki/Extending-with-Custom-Business-Objects
   private async _pnpjs_GetAllItems<T>(libraryName: string, selects: string): Promise<T> {
     return pnp.sp.web.lists.getByTitle(libraryName)
       .items
@@ -101,7 +102,6 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
       const selectsPropsObject: IResponseItemCount = { ItemCount: null };
       const selectsString: string = Object.keys(selectsPropsObject).join(",");
       const responseItemCount: IResponseItemCount = await this._pnpjsGetItemCount<IResponseItemCount>(libraryName, selectsString);
-      debugger;
       const itemCount: number = responseItemCount.ItemCount;
       console.log("itemCount: " + itemCount);
 
