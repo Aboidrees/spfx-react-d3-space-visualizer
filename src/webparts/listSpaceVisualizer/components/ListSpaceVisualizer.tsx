@@ -80,7 +80,6 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
 
 
   private async _pnpjsGetItemCount<T>(libraryName: string, selects: string): Promise<any> {
-    debugger;
     return pnp.sp.web.lists.as(ListItemCount).get();
       // .getByTitle(libraryName)
       // .select(selects)
@@ -142,7 +141,6 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
           .rootFolder
           .folders
           .get();
-        debugger;
         // if the folder has some documents then call again
         responseFolders.forEach((item: IResponseFolder) => {
           return {

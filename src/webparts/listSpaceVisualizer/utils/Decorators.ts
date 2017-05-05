@@ -1,7 +1,33 @@
 
-export function logProperty(target: any, key: string) {
+
+export function select(): PropertyDecorator {
+  // console.log("select(): evaluated");
+  const sym: symbol = Symbol.for("select");
+  return function (target: Object, propertyKey: string): void {
+    const currentValue: string = target[sym];
+    let newValue: string = currentValue !== undefined ? currentValue + "," + propertyKey : propertyKey;
+    target[sym] = newValue;
+    // console.log("select(): called");
+    // console.log(target);
+    // console.log(propertyKey);
+  };
+}
+
+
+export function annotation(tag: string): PropertyDecorator {
+  console.log("annotation(): evaluated");
+  return function (target: Object, propertyKey: string): void {
+    const sym: symbol = Symbol(tag);
+    target[sym] = true;
+    console.log("annotation(): called");
+    console.log(target);
+    console.log(propertyKey);
+  };
+}
+
+export function logProperty(target: Object, key: string): void {
   // property value
-  var _val = target[key];
+  var _val: any = target[key];
 
   // property getter
   var getter = function () {
