@@ -13,6 +13,19 @@ export function select(): PropertyDecorator {
   };
 }
 
+export function expand(expandName: string): PropertyDecorator {
+  // console.log("expand(): evaluated");
+  const sym: symbol = Symbol.for("expand");
+  return function (target: Object, propertyKey: string): void {
+    const currentValue: string = target[sym];
+    let newValue: string = currentValue !== undefined ? currentValue + "," + expandName : expandName;
+    target[sym] = newValue;
+    // console.log("expand(): called");
+    // console.log(target);
+    // console.log(propertyKey);
+  };
+}
+
 
 export function annotation(tag: string): PropertyDecorator {
   console.log("annotation(): evaluated");

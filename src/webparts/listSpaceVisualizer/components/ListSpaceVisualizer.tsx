@@ -8,7 +8,7 @@ import { IFile, IResponseFile, IResponseItem, IResponseFolder, IResponseItemCoun
 import { ListItemCount } from "../model/ListItemCount";
 
 // import pnp and pnp logging system
-import pnp, { Logger, FunctionListener, LogEntry, LogLevel } from "sp-pnp-js";
+import pnp, { Logger, FunctionListener, LogEntry, LogLevel, QueryableConstructor } from "sp-pnp-js";
 // import SPFx Logging system
 import { Log } from "@microsoft/sp-core-library";
 
@@ -79,8 +79,13 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
   }
 
 
-  private async _pnpjsGetItemCount<T>(libraryName: string, selects: string): Promise<any> {
-    return pnp.sp.web.lists.as(ListItemCount).get();
+  private async _pnpjsGetItemCount<T>(libraryName: string): Promise<any> {
+    return pnp.sp.web.lists
+      .getByTitle(libraryName)
+      // Using as("Model") overrides select and expand queries
+      .as(ListItemCount)
+      .getAs<T>();
+      //.get();
       // .getByTitle(libraryName)
       // .select(selects)
       // .get();
@@ -110,7 +115,7 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
       // query Item Count for the Library
       const selectsPropsObject: IResponseItemCount = { ItemCount: null };
       const selectsString: string = Object.keys(selectsPropsObject).join(",");
-      const responseItemCount: IResponseItemCount = await this._pnpjsGetItemCount<IResponseItemCount>(libraryName, selectsString);
+      const responseItemCount: IResponseItemCount = await this._pnpjsGetItemCount<ListItemCount>(libraryName, ListItemCount);
       const itemCount: number = responseItemCount.ItemCount;
       console.log("itemCount: " + itemCount);
 
