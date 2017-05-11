@@ -96,9 +96,11 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
     return pnp.sp.web.lists.getByTitle(libraryName)
       .items
       .select(selects)
+
       .expand("File/Length")
       .get();
   }
+
 
   // async functions were introduced with ES3/ES5 native support in TypeScript 2.1
   // https://blogs.msdn.microsoft.com/typescript/2016/12/07/announcing-typescript-2-1/
@@ -115,17 +117,19 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
       // query Item Count for the Library
       const selectsPropsObject: IResponseItemCount = { ItemCount: null };
       const selectsString: string = Object.keys(selectsPropsObject).join(",");
-      const responseItemCount: IResponseItemCount = await this._pnpjsGetItemCount<ListItemCount>(libraryName, ListItemCount);
+      const responseItemCount: IResponseItemCount = await this._pnpjsGetItemCount<ListItemCount>(libraryName);
       const itemCount: number = responseItemCount.ItemCount;
       console.log("itemCount: " + itemCount);
 
       // we will follow two strategies:
       //  small libraries: get all the items and build the hierarchy object
       //  big libraries: query by folders
-      if (itemCount > 5) {
+      if (itemCount > 50) {
         // big Libraries
 
       } else {
+        const resp = await pnp.sp.web.getCurrentUserEffectivePermissions();
+        debugger;
         const response: IResponseFile[] = await pnp.sp.web.lists
           .getByTitle(libraryName)
           .rootFolder
