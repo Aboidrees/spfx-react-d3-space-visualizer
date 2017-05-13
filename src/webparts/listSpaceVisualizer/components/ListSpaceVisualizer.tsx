@@ -96,7 +96,6 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
     return pnp.sp.web.lists.getByTitle(libraryName)
       .items
       .select(selects)
-
       .expand("File/Length")
       .get();
   }
@@ -128,8 +127,6 @@ export default class ListSpaceVisualizer extends React.Component<IListSpaceVisua
         // big Libraries
 
       } else {
-        const resp = await pnp.sp.web.getCurrentUserEffectivePermissions();
-        debugger;
         const response: IResponseFile[] = await pnp.sp.web.lists
           .getByTitle(libraryName)
           .rootFolder
